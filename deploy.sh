@@ -88,7 +88,7 @@ cd $APP_DIR
 chmod +x docker/*.sh
 export SUPERSET_ENV=production
 export TAG=4.0.2
-export SUPERSET_CONFIG_PATH=$SUPERSET_CONFIG_PATH
+export SUPERSET_CONFIG_PATH="$APP_DIR/superset_config.py"
 export DATABASE_DB=$POSTGRES_DB
 export DATABASE_HOST=172.17.0.1
 export DATABASE_PASSWORD=$POSTGRES_PASSWORD
