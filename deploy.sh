@@ -27,6 +27,9 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 # Check if docker installed
 docker-compose --version
 if [ $? -ne 0 ]; then
+  echo "Docker Compose is already installed. Skipping..."
+
+else
   # Install Docker
   sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -82,7 +85,14 @@ echo "SECRET_KEY="$SECRET_KEY" >> "$SUPERSET_CONFIG_PATH""
 
 # Build and run the Docker containers from the app directory (~/myapp)
 cd $APP_DIR
+chmod +x docker/*.sh
+export SUPERSET_ENV=production
 export TAG=4.0.2
+export DATABASE_DB=$POSTGRES_DB
+export DATABASE_HOST=172.0.2.1
+
+export DATABASE_PASSWORD=$POSTGRES_PASSWORD
+export DATABASE_USER=$POSTGRES_USER
 sudo docker-compose -f docker-compose-non-dev.yml up --build -d
 sudo docker-compose -f docker-compose-non-dev.yml exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
 
