@@ -103,6 +103,36 @@ SQLLAB_CTAS_NO_LIMIT = True
 # Optionally import superset_config_docker.py (which will have been included on
 # the PYTHONPATH) in order to allow for local settings to be overridden
 #
+
+
+
+
+SQLALCHEMY_ECHO = True
+
+FEATURE_FLAGS = {
+    "EMBEDDED_SUPERSET": True,
+    "ENABLE_TEMPLATE_PROCESSING": True,
+    "ALERT_REPORTS": True,
+}
+LOAD_EXAMPLES = False
+OVERRIDE_HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
+TALISMAN_ENABLED = False
+ENABLE_CORS = True
+HTTP_HEADERS={"X-Frame-Options":"ALLOWALL"}
+ENABLE_PROXY_FIX = True
+PUBLIC_ROLE_LIKE_GAMMA = True
+GUEST_ROLE_NAME = "Gamma"
+GUEST_TOKEN_JWT_EXP_SECONDS = 3600  # 1 hour
+WTF_CSRF_ENABLED = False
+CORS_OPTIONS = {
+    "supports_credentials": True,
+    "allow_headers": ["*"],
+    "resources": ["*"],
+    "origins": ["http://localhost:8088", "http://localhost:8888"],
+}
+
+
+
 try:
     import superset_config_docker
     from superset_config_docker import *  # noqa

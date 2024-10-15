@@ -10,7 +10,7 @@ SECRET_KEY=$(openssl rand -base64 32)  # Generate a random 32-character secret k
 REPO_URL="https://github.com/yapitasi/superset.git"
 APP_DIR=~/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
-SUPERSET_CONFIG_PATH="$APP_DIR/superset_config_docker.py"
+SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_docker.py"
 # Update package list and upgrade existing packages
 sudo apt update && sudo apt upgrade -y
 
@@ -88,15 +88,15 @@ cd $APP_DIR
 chmod +x docker/*.sh
 export SUPERSET_ENV=production
 export TAG=4.0.2
-export SUPERSET_CONFIG_PATH="$APP_DIR/superset_config.py"
+export SUPERSET_CONFIG_PATH=$APP_DIR/superset_config.py
 export DATABASE_DB=$POSTGRES_DB
 export DATABASE_HOST=172.17.0.1
 export DATABASE_PASSWORD=$POSTGRES_PASSWORD
 export DATABASE_USER=$POSTGRES_USER
 
 
-sudo docker-compose -f docker-compose-non-dev.yml up --build -d
-sudo docker-compose -f docker-compose-non-dev.yml exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
+sudo docker-compose -f docker-compose-image-tag.yml up --build -d
+sudo docker-compose -f docker-compose-image-tag.yml exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
 
 # Check if Docker Compose started correctly
 if ! sudo docker-compose ps | grep "Up"; then
