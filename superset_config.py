@@ -23,6 +23,7 @@
 # superset/config.py
 #
 
+import superset_config_docker
 
 SQLALCHEMY_ECHO = True
 

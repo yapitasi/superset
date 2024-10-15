@@ -10,7 +10,7 @@ SECRET_KEY=$(openssl rand -base64 32)  # Generate a random 32-character secret k
 REPO_URL="https://github.com/yapitasi/superset.git"
 APP_DIR=~/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
-SUPERSET_CONFIG_PATH="$APP_DIR/superset_config.py"
+SUPERSET_CONFIG_PATH="$APP_DIR/superset_config_docker.py"
 # Update package list and upgrade existing packages
 sudo apt update && sudo apt upgrade -y
 
