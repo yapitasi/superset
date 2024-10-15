@@ -88,11 +88,13 @@ cd $APP_DIR
 chmod +x docker/*.sh
 export SUPERSET_ENV=production
 export TAG=4.0.2
+export SUPERSET_CONFIG_PATH=$SUPERSET_CONFIG_PATH
 export DATABASE_DB=$POSTGRES_DB
-export DATABASE_HOST=172.0.2.1
-
+export DATABASE_HOST=172.17.0.1
 export DATABASE_PASSWORD=$POSTGRES_PASSWORD
 export DATABASE_USER=$POSTGRES_USER
+
+
 sudo docker-compose -f docker-compose-non-dev.yml up --build -d
 sudo docker-compose -f docker-compose-non-dev.yml exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
 
