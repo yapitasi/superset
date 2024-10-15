@@ -71,13 +71,14 @@ fi
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@172.17.0.1:5432/$POSTGRES_DB
 # Create the .env file inside the app directory (~/myapp/.env)
 echo "SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI" > "$SUPERSET_CONFIG_PATH"
-ECHO "SECRET_KEY=$SECRET_KEY" >> "$SUPERSET_CONFIG_PATH"
+echo "SECRET_KEY=$SECRET_KEY" >> "$SUPERSET_CONFIG_PATH"
 
 
 # Build and run the Docker containers from the app directory (~/myapp)
 cd $APP_DIR
-sudo docker-compose up --build -d
-sudp docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
+export TAG=4.0.2
+sudo docker-compose -f docker-compose-non-dev.yml up --build -d
+sudo docker-compose -f docker-compose-non-dev.yml exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
 
 # Check if Docker Compose started correctly
 if ! sudo docker-compose ps | grep "Up"; then
@@ -95,3 +96,4 @@ The .env file has been created with the following values:
 - POSTGRES_DB
 - SQLALCHEMY_DATABASE_URI
 - SECRET_KEY
+"
