@@ -25,6 +25,7 @@ sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 # Check if docker installed
+echo "Checking if Docker is installed..."
 docker-compose --version
 if [ $? -ne 0 ]; then
   echo "Docker Compose is already installed. Skipping..."
@@ -79,7 +80,7 @@ fi
 
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@172.17.0.1:5432/$POSTGRES_DB
 # Create the .env file inside the app directory (~/myapp/.env)
-echo "SQLALCHEMY_DATABASE_URI="$SQLALCHEMY_DATABASE_URI"" > "$SUPERSET_CONFIG_PATH"
+echo "SQLALCHEMY_DATABASE_URI="""$SQLALCHEMY_DATABASE_URI"""" >> "$SUPERSET_CONFIG_PATH"
 echo "SECRET_KEY="$SECRET_KEY" >> "$SUPERSET_CONFIG_PATH""
 
 
