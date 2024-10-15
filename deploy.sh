@@ -70,8 +70,8 @@ fi
 
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@172.17.0.1:5432/$POSTGRES_DB
 # Create the .env file inside the app directory (~/myapp/.env)
-echo "SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI" > "$SUPERSET_CONFIG_PATH"
-echo "SECRET_KEY=$SECRET_KEY" >> "$SUPERSET_CONFIG_PATH"
+echo "SQLALCHEMY_DATABASE_URI=\"$SQLALCHEMY_DATABASE_URI\"" > "$SUPERSET_CONFIG_PATH"
+echo "SECRET_KEY=\"$SECRET_KEY" >> "$SUPERSET_CONFIG_PATH\""
 
 
 # Build and run the Docker containers from the app directory (~/myapp)
