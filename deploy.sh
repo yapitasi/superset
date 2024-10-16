@@ -1,16 +1,22 @@
 #!/bin/bash
 
-# Env Vars
+# Env Vars for Superset
 POSTGRES_USER="superset"
-POSTGRES_PASSWORD=$(openssl rand -base64 12)  # Generate a random 12-character password
+POSTGRES_PASSWORD="**CHANGE_THIS_PASSWORD**"  # Generate a random password
 POSTGRES_DB="superset"
-SECRET_KEY=$(openssl rand -base64 32)  # Generate a random 32-character secret key
+SECRET_KEY="**CHANGE_THIS_SECRET_KEY**"  # Generate a random 32-character secret key
 
-# Script Vars
+# Script Vars for Superset
 REPO_URL="https://github.com/yapitasi/superset.git"
 APP_DIR=~/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
 SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_docker.py"
+
+# Variables for PostgreSQL
+PG_REPO_URL="https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+ALLOWED_IP_RANGE="0.0.0.0/0"  # Allow all IPs to connect
+PG_SERVICE="postgresql"
+
 # Update package list and upgrade existing packages
 sudo apt update && sudo apt upgrade -y
 
@@ -23,6 +29,55 @@ sudo swapon /swapfile
 
 # Make swap permanent
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# Function to install PostgreSQL
+install_postgresql() {
+    echo "Adding PostgreSQL Apt repository if not already added..."
+    if ! grep -q "apt.postgresql.org" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
+        sudo apt update
+        sudo apt install -y wget gnupg2
+        wget -qO - $PG_REPO_URL | sudo apt-key add -
+        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+        sudo apt update
+    else
+        echo "PostgreSQL repository already exists."
+    fi
+
+    echo "Installing PostgreSQL..."
+    sudo apt install -y postgresql postgresql-contrib
+}
+
+# Configure PostgreSQL for remote access
+configure_postgresql() {
+    echo "Configuring PostgreSQL to listen on all interfaces..."
+    PG_CONF=$(sudo find /etc/postgresql/ -name postgresql.conf | sort | tail -n 1)
+    sudo sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/g" $PG_CONF
+
+    echo "Allowing remote connections..."
+    PG_HBA=$(sudo find /etc/postgresql/ -name pg_hba.conf | sort | tail -n 1)
+    echo "host    all             all             $ALLOWED_IP_RANGE            md5" | sudo tee -a $PG_HBA > /dev/null
+}
+
+# Function to restart PostgreSQL service
+restart_postgresql() {
+    echo "Restarting PostgreSQL service..."
+    sudo systemctl restart $PG_SERVICE
+}
+
+# Function to create PostgreSQL user and database
+create_user_and_db() {
+    echo "Creating PostgreSQL user and database..."
+    sudo -u postgres psql -c "CREATE USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASSWORD';"
+    sudo -u postgres psql -c "CREATE DATABASE $POSTGRES_DB OWNER $POSTGRES_USER;"
+}
+
+# Install PostgreSQL and set up user/db
+echo "Setting up PostgreSQL..."
+install_postgresql
+configure_postgresql
+restart_postgresql
+create_user_and_db
+restart_postgresql
 
 # Check if docker installed
 echo "Checking if Docker is installed..."
@@ -47,7 +102,6 @@ fi
 if [ ! -f /usr/local/bin/docker-compose ]; then
   echo "Docker Compose download failed. Exiting."
   exit 1
-
 
 fi
 
@@ -77,14 +131,12 @@ else
   cd $APP_DIR
 fi
 
-
+# Set up SQLAlchemy URI and Secret Key in Superset config
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@172.17.0.1:5432/$POSTGRES_DB
-
-echo "SQLALCHEMY_DATABASE_URI=\"$SQLALCHEMY_DATABASE_URI\""> $SUPERSET_CONFIG_PATH
+echo "SQLALCHEMY_DATABASE_URI=\"$SQLALCHEMY_DATABASE_URI\"" > $SUPERSET_CONFIG_PATH
 echo "SECRET_KEY=\"$SECRET_KEY\"" >> $SUPERSET_CONFIG_PATH
 
-
-# Build and run the Docker containers from the app directory (~/myapp)
+# Build and run the Docker containers from the app directory
 cd $APP_DIR
 chmod +x docker/*.sh
 export SUPERSET_ENV=production
@@ -94,7 +146,6 @@ export DATABASE_DB=$POSTGRES_DB
 export DATABASE_HOST=172.17.0.1
 export DATABASE_PASSWORD=$POSTGRES_PASSWORD
 export DATABASE_USER=$POSTGRES_USER
-
 
 sudo docker-compose -f docker-compose-image-tag.yml up --build -d
 sudo docker-compose -f docker-compose-image-tag.yml exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
@@ -106,13 +157,4 @@ if ! sudo docker-compose ps | grep "Up"; then
 fi
 
 # Output final message
-echo "Deployment complete. Your Next.js app and PostgreSQL database are now running.
-Next.js is available at https://$DOMAIN_NAME, and the PostgreSQL database is accessible from the web service.
-
-The .env file has been created with the following values:
-- POSTGRES_USER
-- POSTGRES_PASSWORD (randomly generated)
-- POSTGRES_DB
-- SQLALCHEMY_DATABASE_URI
-- SECRET_KEY
-"
+echo "Deployment complete. Your Superset app and PostgreSQL database are now running."
