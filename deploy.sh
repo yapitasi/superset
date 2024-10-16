@@ -12,12 +12,17 @@ APP_DIR=~/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
 SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_docker.py"
 
-# Variables for PostgreSQL
-PG_REPO_URL="https://www.postgresql.org/media/keys/ACCC4CF8.asc"
-ALLOWED_IP_RANGE="0.0.0.0/0"  # Allow all IPs to connect
-PG_SERVICE="postgresql"
+
+# Add PostgreSQL repository
+wget -qO -https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Add Docker repository
+wget -qO https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" -y
 
 # Update package list and upgrade existing packages
+
 sudo apt update && sudo apt upgrade -y
 
 # Add Swap Space
@@ -32,17 +37,6 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 # Function to install PostgreSQL
 install_postgresql() {
-    echo "Adding PostgreSQL Apt repository if not already added..."
-    if ! grep -q "apt.postgresql.org" /etc/apt/sources.list /etc/apt/sources.list.d/*; then
-        sudo apt update
-        sudo apt install -y wget gnupg2
-        wget -qO - $PG_REPO_URL | sudo apt-key add -
-        sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-        sudo apt update
-    else
-        echo "PostgreSQL repository already exists."
-    fi
-
     echo "Installing PostgreSQL..."
     sudo apt install -y postgresql postgresql-contrib
 }
@@ -55,13 +49,13 @@ configure_postgresql() {
 
     echo "Allowing remote connections..."
     PG_HBA=$(sudo find /etc/postgresql/ -name pg_hba.conf | sort | tail -n 1)
-    echo "host    all             all             $ALLOWED_IP_RANGE            md5" | sudo tee -a $PG_HBA > /dev/null
+    echo "host    all             all             0.0.0.0/0            md5" | sudo tee -a $PG_HBA > /dev/null
 }
 
 # Function to restart PostgreSQL service
 restart_postgresql() {
     echo "Restarting PostgreSQL service..."
-    sudo systemctl restart $PG_SERVICE
+    sudo systemctl restart postgresql
 }
 
 # Function to create PostgreSQL user and database
@@ -77,7 +71,6 @@ install_postgresql
 configure_postgresql
 restart_postgresql
 create_user_and_db
-restart_postgresql
 
 # Check if docker installed
 echo "Checking if Docker is installed..."
@@ -85,10 +78,7 @@ docker-compose --version
 if [ $? -ne 0 ]; then
 
   # Install Docker
-  sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" -y
-  sudo apt update
+
   sudo apt install docker-ce -y
 
   # Install Docker Compose
@@ -146,17 +136,21 @@ export DATABASE_HOST=172.17.0.1
 export DATABASE_PASSWORD=$POSTGRES_PASSWORD
 export DATABASE_USER=$POSTGRES_USER
 
-sudo docker-compose up --build -d
+sudo docker-compose build
+sudo docker-compose up -d
+
 #sudo docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
-sudo docker cp ./yapitasi-logo.png superset_app:/app/superset/static/assets/images/superset-logo-horiz.png
-sudo docker cp ./dashboards.zip superset_app:/app/dashboards.zip
-sudo docker-compose exec superset superset import_dashboards -p /app/dashboards.zip -u admin
+
 
 # Check if Docker Compose started correctly
 if ! sudo docker-compose ps | grep "Up"; then
   echo "Docker containers failed to start. Check logs with 'docker-compose logs'."
   exit 1
 fi
+sudo docker cp ./yapitasi-logo.png superset_app:/app/superset/static/assets/images/superset-logo-horiz.png
+sudo docker cp ./dashboards.zip superset_app:/app/dashboards.zip
+sudo docker-compose exec superset superset import_dashboards -p /app/dashboards.zip -u admin
+
 
 # Output final message
 echo "Deployment complete. Your Superset app and PostgreSQL database are now running."
