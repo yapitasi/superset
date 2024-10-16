@@ -146,8 +146,10 @@ export DATABASE_HOST=172.17.0.1
 export DATABASE_PASSWORD=$POSTGRES_PASSWORD
 export DATABASE_USER=$POSTGRES_USER
 
-sudo docker-compose -f docker-compose-image-tag.yml up --build -d
-sudo docker-compose -f docker-compose-image-tag.yml exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
+sudo docker-compose up --build -d
+sudo docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
+sudo docker cp ./yapitasi-logo.png superset_app:/app/superset/static/assets/images/superset-logo-horiz.png
+
 
 # Check if Docker Compose started correctly
 if ! sudo docker-compose ps | grep "Up"; then
