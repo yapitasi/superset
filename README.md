@@ -11,7 +11,7 @@ Bu doküman, `deploy.sh` dosyasını indirip çalıştırarak Apache Superset ve
 1. **`deploy.sh` Dosyasını İndirip çalıştırın:**
 
     ```bash
-    wget https://raw.githubusercontent.com/yapitasi/superset/main/deploy.sh
+    wget --no-cache https://raw.githubusercontent.com/yapitasi/superset/main/deploy.sh
     sudo chmod +x deploy.sh
     sudo ./deploy.sh
     ```
