@@ -83,9 +83,7 @@ restart_postgresql
 echo "Checking if Docker is installed..."
 docker-compose --version
 if [ $? -ne 0 ]; then
-  echo "Docker Compose is already installed. Skipping..."
 
-else
   # Install Docker
   sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -96,7 +94,8 @@ else
   # Install Docker Compose
   sudo rm -f /usr/local/bin/docker-compose
   sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
+else
+  echo "Docker Compose is already installed. Skipping..."
 fi
 # Wait for the file to be fully downloaded before proceeding
 if [ ! -f /usr/local/bin/docker-compose ]; then
