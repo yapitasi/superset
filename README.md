@@ -8,17 +8,12 @@ Bu doküman, `deploy.sh` dosyasını indirip çalıştırarak Apache Superset ve
 
 ## Kurulum Adımları
 
-1. **`deploy.sh` Dosyasını İndirin:**
+1. **`deploy.sh` Dosyasını İndirip çalıştırın:**
 
     ```bash
     wget https://raw.githubusercontent.com/yapitasi/superset/main/deploy.sh
-    ```
-
-2. **`deploy.sh` Dosyasını Çalıştırın:**
-
-    ```bash
-    chmod +x deploy.sh
-    ./deploy.sh
+    sudo chmod +x deploy.sh
+    sudo ./deploy.sh
     ```
 
 ## Konfigürasyon
