@@ -8,7 +8,7 @@ SECRET_KEY="**CHANGE_THIS_SECRET_KEY**"  # Generate a random 32-character secret
 
 # Script Vars for Superset
 REPO_URL="https://github.com/yapitasi/superset.git"
-APP_DIR=~/superset
+APP_DIR=/opt/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
 SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_docker.py"
 
@@ -131,13 +131,9 @@ chmod +x docker/*.sh
 export SUPERSET_ENV=production
 export TAG=f5ae176
 export SUPERSET_CONFIG_PATH=$APP_DIR/superset_config.py
-export DATABASE_DB=$POSTGRES_DB
-export DATABASE_HOST=172.17.0.1
-export DATABASE_PASSWORD=$POSTGRES_PASSWORD
-export DATABASE_USER=$POSTGRES_USER
 
-sudo docker-compose build
-sudo docker-compose up -d
+
+sudo docker-compose up --build -d
 
 #sudo docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
 
