@@ -134,9 +134,9 @@ export TAG=f5ae176
 export SUPERSET_CONFIG_PATH=$APP_DIR/superset_config.py
 
 
-sudo docker-compose up --build -d
+sudo docker-compose up --build -d --wait
 
-#sudo docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
+sudo docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
 sudo docker cp ./yapitasi-logo.png superset_app:/app/superset/static/assets/images/superset-logo-horiz.png
 
 

@@ -29,15 +29,6 @@ Superset /opt/superset dizinine kurulur.
 
 Bu değişkenler `deploy.sh` dosyasında çalıştırmadan önce değiştirilebilir.
 
-## Docker Compose Servisleri
-
-`docker-compose.yml` dosyası aşağıdaki servisleri tanımlar:
-
-- **redis**: Redis önbelleği
-- **superset**: Ana Superset uygulaması
-- **superset-init**: Superset için başlatma servisi
-- **superset-worker**: Superset için Celery işçisi
-- **superset-worker-beat**: Superset için Celery beat zamanlayıcısı
 
 ## Kullanım
 
@@ -46,11 +37,11 @@ Bu değişkenler `deploy.sh` dosyasında çalıştırmadan önce değiştirilebi
 ## Sorun Giderme
 
 Docker konteynerleri başlatılamazsa, logları kontrol edin:
-
+docker-compose logs
 
 Örnek veritabanını yüklemek için aşağıdaki komutu çalıştırın:
-    ```bash
+```bash
+cd /opt/superset
 sudo docker cp ./dashboards.zip superset_app:/app/dashboards.zip
 sudo docker-compose exec superset superset import_dashboards -p /app/dashboards.zip -u admin
-    ```
-docker-compose logs
+```
