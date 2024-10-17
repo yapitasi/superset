@@ -147,10 +147,6 @@ if ! sudo docker-compose ps | grep "Up"; then
   echo "Docker containers failed to start. Check logs with 'docker-compose logs'."
   exit 1
 fi
-#sudo docker cp ./yapitasi-logo.png superset_app:/app/superset/static/assets/images/superset-logo-horiz.png
-#sudo docker cp ./dashboards.zip superset_app:/app/dashboards.zip
-#sudo docker-compose exec superset superset import_dashboards -p /app/dashboards.zip -u admin
-
 
 # Output final message
 echo "Deployment complete. Your Superset app and PostgreSQL database are now running."
