@@ -99,7 +99,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Copy the compiled frontend assets
 COPY --chown=superset:superset --from=superset-node /app/superset/static/assets superset/static/assets
-COPY --chown=superset:superset yapitasi-logo.png /app/superset/static/assets/images/superset-logo-horiz.png
+COPY --chown=superset:superset ./yapitasi-logo.png /app/superset/static/assets/images/superset-logo-horiz.png
 ## Lastly, let's install superset itself
 COPY --chown=superset:superset superset superset
 RUN --mount=type=cache,target=/root/.cache/pip \

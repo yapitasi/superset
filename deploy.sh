@@ -137,6 +137,9 @@ export SUPERSET_CONFIG_PATH=$APP_DIR/superset_config.py
 sudo docker-compose up --build -d
 
 #sudo docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
+sudo docker cp ./yapitasi-logo.png superset_app:/app/superset/static/assets/images/superset-logo-horiz.png
+sudo docker cp ./dashboards.zip superset_app:/app/dashboards.zip
+#sudo docker-compose exec superset superset import_dashboards -p /app/dashboards.zip -u admin
 
 
 # Check if Docker Compose started correctly
