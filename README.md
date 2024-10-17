@@ -15,6 +15,8 @@ Bu doküman, `deploy.sh` dosyasını indirip çalıştırarak Apache Superset ve
     sudo chmod +x deploy.sh
     sudo ./deploy.sh
     ```
+Superset /opt/superset dizinine kurulur.
+
 
 ## Konfigürasyon
 
@@ -45,5 +47,10 @@ Bu değişkenler `deploy.sh` dosyasında çalıştırmadan önce değiştirilebi
 
 Docker konteynerleri başlatılamazsa, logları kontrol edin:
 
-```bash
+
+Örnek veritabanını yüklemek için aşağıdaki komutu çalıştırın:
+    ```bash
+sudo docker cp ./dashboards.zip superset_app:/app/dashboards.zip
+sudo docker-compose exec superset superset import_dashboards -p /app/dashboards.zip -u admin
+    ```
 docker-compose logs

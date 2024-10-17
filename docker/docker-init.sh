@@ -62,6 +62,4 @@ echo_step "2" "Complete" "Setting up admin user"
 # Create default roles and permissions
 echo_step "3" "Starting" "Setting up roles and perms"
 superset init
-
 echo_step "4" "Complete" "Adding database"
-superset import_dashboards -p /app/dashboards.zip -u admin
