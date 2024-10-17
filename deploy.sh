@@ -128,6 +128,7 @@ echo "SECRET_KEY=\"$SECRET_KEY\"" >> $SUPERSET_CONFIG_PATH
 # Build and run the Docker containers from the app directory
 cd $APP_DIR
 chmod +x docker/*.sh
+
 export SUPERSET_ENV=production
 export TAG=f5ae176
 export SUPERSET_CONFIG_PATH=$APP_DIR/superset_config.py
