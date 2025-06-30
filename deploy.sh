@@ -12,13 +12,30 @@ APP_DIR=/opt/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
 SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_docker.py"
 
-
 # Add PostgreSQL repository
 wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 
+# Ensure wget is installed
+if ! command -v wget >/dev/null 2>&1; then
+    echo "wget not found. Installing wget..."
+    sudo apt update
+    sudo apt install -y wget
+else
+    echo "wget is already installed. Skipping..."
+fi
+
+# Ensure git is installed
+if ! command -v git >/dev/null 2>&1; then
+    echo "git not found. Installing git..."
+    sudo apt update
+    sudo apt install -y git
+else
+    echo "git is already installed. Skipping..."
+fi
+
 # Add Docker repository
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+wget -qO - https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" -y
 
 # Update package list and upgrade existing packages
@@ -78,12 +95,11 @@ docker-compose --version
 if [ $? -ne 0 ]; then
 
   # Install Docker
-
   sudo apt install docker-ce -y
 
   # Install Docker Compose
   sudo rm -f /usr/local/bin/docker-compose
-  sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo wget -O /usr/local/bin/docker-compose "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)"
 else
   echo "Docker Compose is already installed. Skipping..."
 fi
@@ -91,7 +107,6 @@ fi
 if [ ! -f /usr/local/bin/docker-compose ]; then
   echo "Docker Compose download failed. Exiting."
   exit 1
-
 fi
 
 sudo chmod +x /usr/local/bin/docker-compose
@@ -133,13 +148,10 @@ export SUPERSET_ENV=production
 export TAG=f5ae176
 export SUPERSET_CONFIG_PATH=$APP_DIR/superset_config.py
 
-
 sudo docker-compose up --build -d --wait
 
 sudo docker-compose exec superset superset set_database_uri --database_name $POSTGRES_DB --uri "$SQLALCHEMY_DATABASE_URI"
 sudo docker cp ./yapitasi-logo.png superset_app:/app/superset/static/assets/images/superset-logo-horiz.png
-
-
 
 # Check if Docker Compose started correctly
 if ! sudo docker-compose ps | grep "Up"; then
