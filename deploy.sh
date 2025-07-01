@@ -1,10 +1,17 @@
 #!/bin/bash
 
 # Env Vars for Superset
-POSTGRES_USER="superset"
-POSTGRES_PASSWORD="**CHANGE_THIS_PASSWORD**"  # Generate a random password
-POSTGRES_DB="superset"
-SECRET_KEY="**CHANGE_THIS_SECRET_KEY**"  # Generate a random 32-character secret key
+POSTGRES_USER=superset
+POSTGRES_PASSWORD=default
+POSTGRES_DB=superset
+SECRET_KEY=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-32)  # Generate a random 32-character secret key
+# Check if PostgreSQL password is still default
+if [ "$POSTGRES_PASSWORD" = "default" ]; then
+    echo "ERROR: PostgreSQL password is still set to 'default'"
+    echo "Please change the POSTGRES_PASSWORD variable in this script before running it."
+    echo "For security reasons, the script will not proceed with the default password."
+    exit 1
+fi
 
 # Script Vars for Superset
 REPO_URL="https://github.com/yapitasi/superset.git"
