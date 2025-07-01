@@ -71,7 +71,7 @@ RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.j
     fi
 
 # Runs the webpack build process
-COPY superset-frontend /app/superset-frontend
+#COPY superset-frontend /app/superset-frontend
 
 ######################################################################
 # superset-node used for compile frontend assets
