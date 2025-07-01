@@ -181,8 +181,8 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
 
 # Copy required files for Python build
 COPY pyproject.toml setup.py MANIFEST.in README.md ./
-COPY superset-frontend/package.json superset-frontend/
-COPY scripts/check-env.py scripts/
+#COPY superset-frontend/package.json superset-frontend/
+#COPY scripts/check-env.py scripts/
 
 # keeping for backward compatibility
 COPY --chmod=755 ./docker/entrypoints/run-server.sh /usr/bin/
