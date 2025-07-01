@@ -57,7 +57,6 @@ services:
       SUPERSET_LOG_LEVEL: "${SUPERSET_LOG_LEVEL:-info}"
 
   superset-init:
-
     image: *superset-image
     container_name: superset_init
     command: ["/app/docker/docker-init.sh"]
