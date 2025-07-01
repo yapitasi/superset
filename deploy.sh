@@ -10,7 +10,7 @@ SECRET_KEY="**CHANGE_THIS_SECRET_KEY**"  # Generate a random 32-character secret
 REPO_URL="https://github.com/yapitasi/superset.git"
 APP_DIR=/opt/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
-SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_docker.py"
+SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_local.example"
 
 # Add PostgreSQL repository
 wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
@@ -137,7 +137,8 @@ fi
 
 # Set up SQLAlchemy URI and Secret Key in Superset config
 SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@172.17.0.1:5432/$POSTGRES_DB
-echo "SQLALCHEMY_DATABASE_URI=\"$SQLALCHEMY_DATABASE_URI\"" > $SUPERSET_CONFIG_PATH
+mv $APP_DIR/docker/pythonpath_dev/superset_config_local.example $SUPERSET_CONFIG_PATH
+echo "SQLALCHEMY_DATABASE_URI=\"$SQLALCHEMY_DATABASE_URI\"" >> $SUPERSET_CONFIG_PATH
 echo "SECRET_KEY=\"$SECRET_KEY\"" >> $SUPERSET_CONFIG_PATH
 
 # Build and run the Docker containers from the app directory
@@ -145,7 +146,7 @@ cd $APP_DIR
 chmod +x docker/*.sh
 
 export SUPERSET_ENV=production
-export TAG=f5ae176
+export TAG=5.0.0
 export SUPERSET_CONFIG_PATH=$APP_DIR/superset_config.py
 
 sudo docker-compose up --build -d --wait
