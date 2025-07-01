@@ -10,7 +10,7 @@ SECRET_KEY="**CHANGE_THIS_SECRET_KEY**"  # Generate a random 32-character secret
 REPO_URL="https://github.com/yapitasi/superset.git"
 APP_DIR=/opt/superset
 SWAP_SIZE="1G"  # Swap size of 1GB
-SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_local.example"
+SUPERSET_CONFIG_PATH="$APP_DIR/docker/pythonpath_dev/superset_config_docker.py"
 
 # Add PostgreSQL repository
 wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
