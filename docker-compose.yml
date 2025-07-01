@@ -77,6 +77,8 @@ services:
       SUPERSET_LOG_LEVEL: "${SUPERSET_LOG_LEVEL:-info}"
 
   superset-worker:
+    build:
+      context: .
     image: *superset-image
     container_name: superset_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
