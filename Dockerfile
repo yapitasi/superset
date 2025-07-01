@@ -190,17 +190,6 @@ RUN /app/docker/apt-install.sh \
       libecpg-dev \
       libldap2-dev
 
-# Copy compiled things from previous stages
-COPY --from=superset-node /app/superset/static/assets superset/static/assets
-
-# TODO, when the next version comes out, use --exclude superset/translations
-COPY superset superset
-# TODO in the meantime, remove the .po files
-
-
-# Merging translations from backend and frontend stages
-COPY --from=superset-node /app/superset/translations superset/translations
-COPY --from=python-translation-compiler /app/translations_mo superset/translations
 
 HEALTHCHECK CMD curl -f "http://localhost:${SUPERSET_PORT}/health"
 CMD ["/app/docker/entrypoints/run-server.sh"]
