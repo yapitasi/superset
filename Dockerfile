@@ -7,7 +7,7 @@ RUN apt-get update && \
 
 
 
-RUN pip install --no-cache gevent psycopg2 redis playwright && \
+RUN pip install --no-cache gevent psycopg2-binary redis playwright && \
 playwright install-deps chromium
 
 USER superset
