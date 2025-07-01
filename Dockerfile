@@ -173,9 +173,6 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
         echo "Skipping browser installation"; \
     fi
 
-# Copy required files for Python build
-COPY pyproject.toml setup.py MANIFEST.in README.md ./
-COPY superset-frontend/package.json superset-frontend/
 
 
 # Some debian libs
