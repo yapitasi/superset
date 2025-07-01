@@ -196,7 +196,7 @@ COPY --from=superset-node /app/superset/static/assets superset/static/assets
 # TODO, when the next version comes out, use --exclude superset/translations
 COPY superset superset
 # TODO in the meantime, remove the .po files
-RUN rm superset/translations/*/*/*.po
+
 
 # Merging translations from backend and frontend stages
 COPY --from=superset-node /app/superset/translations superset/translations
