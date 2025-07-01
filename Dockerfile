@@ -133,6 +133,12 @@ COPY requirements/translations.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/uv \
     . /app/.venv/bin/activate && /app/docker/pip-install.sh --requires-build-essential -r requirements/translations.txt
 
+COPY superset/translations/ /app/translations_mo/
+RUN if [ "$BUILD_TRANSLATIONS" = "true" ]; then \
+        pybabel compile -d /app/translations_mo | true; \
+    fi; \
+    rm -f /app/translations_mo/*/*/*.po; \
+    rm -f /app/translations_mo/*/*/*.json;
 
 ######################################################################
 # Python APP common layer
@@ -173,7 +179,13 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
         echo "Skipping browser installation"; \
     fi
 
+# Copy required files for Python build
+COPY pyproject.toml setup.py MANIFEST.in README.md ./
+COPY superset-frontend/package.json superset-frontend/
+COPY scripts/check-env.py scripts/
 
+# keeping for backward compatibility
+COPY --chmod=755 ./docker/entrypoints/run-server.sh /usr/bin/
 
 # Some debian libs
 RUN /app/docker/apt-install.sh \
@@ -184,6 +196,17 @@ RUN /app/docker/apt-install.sh \
       libecpg-dev \
       libldap2-dev
 
+# Copy compiled things from previous stages
+COPY --from=superset-node /app/superset/static/assets superset/static/assets
+
+# TODO, when the next version comes out, use --exclude superset/translations
+COPY superset superset
+# TODO in the meantime, remove the .po files
+RUN rm superset/translations/*/*/*.po
+
+# Merging translations from backend and frontend stages
+COPY --from=superset-node /app/superset/translations superset/translations
+COPY --from=python-translation-compiler /app/translations_mo superset/translations
 
 HEALTHCHECK CMD curl -f "http://localhost:${SUPERSET_PORT}/health"
 CMD ["/app/docker/entrypoints/run-server.sh"]
@@ -210,6 +233,23 @@ USER superset
 ######################################################################
 FROM python-common AS dev
 
+# Debian libs needed for dev
+RUN /app/docker/apt-install.sh \
+    git \
+    pkg-config \
+    default-libmysqlclient-dev
+
+# Copy development requirements and install them
+COPY requirements/*.txt requirements/
+# Install Python dependencies using docker/pip-install.sh
+RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
+    /app/docker/pip-install.sh --requires-build-essential -r requirements/development.txt
+# Install the superset package
+RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
+    uv pip install .
+
+RUN uv pip install .[postgres]
+RUN python -m compileall /app/superset
 
 USER superset
 
