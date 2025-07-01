@@ -210,23 +210,6 @@ USER superset
 ######################################################################
 FROM python-common AS dev
 
-# Debian libs needed for dev
-RUN /app/docker/apt-install.sh \
-    git \
-    pkg-config \
-    default-libmysqlclient-dev
-
-# Copy development requirements and install them
-COPY requirements/*.txt requirements/
-# Install Python dependencies using docker/pip-install.sh
-RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
-    /app/docker/pip-install.sh --requires-build-essential -r requirements/development.txt
-# Install the superset package
-RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
-    uv pip install .
-
-RUN uv pip install .[postgres]
-RUN python -m compileall /app/superset
 
 USER superset
 
