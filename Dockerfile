@@ -146,6 +146,19 @@ ENV SUPERSET_HOME="/app/superset_home" \
     PYTHONPATH="/app/pythonpath" \
     SUPERSET_PORT="8088"
 
+# Copy the entrypoints, make them executable in userspace
+COPY --chmod=755 docker/entrypoints /app/docker/entrypoints
+
+WORKDIR /app
+# Set up necessary directories and user
+RUN mkdir -p \
+      ${PYTHONPATH} \
+      superset/static \
+      requirements \
+      superset-frontend \
+      apache_superset.egg-info \
+      requirements \
+    && touch superset/static/version_info.json
 
 # Install Playwright and optionally setup headless browsers
 ARG INCLUDE_CHROMIUM="true"
